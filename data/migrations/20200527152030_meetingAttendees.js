@@ -12,3 +12,4 @@ exports.up = function(knex) {
     return knex.schema.dropTableIfExists(tableName)
   }
   
+  exports.tableName; 
