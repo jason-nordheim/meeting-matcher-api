@@ -6,10 +6,12 @@ const config = {
 }
 const cors = require('cors')
 const bcrypt = require('bcrypt')
-const jwt = require('jsonwebtoken'); 
+const jwt = require('jsonwebtoken') 
 const bodyParser = require('body-parser')
 const express = require('express')
-const db = require("./config/database"); 
+const db = require("./config/database")
+const User = require("./models/User")
+const Meeting = require("./models/Meeting")
 
 //const UserRouter = require('./routes/users') // not needed for now 
 
@@ -21,17 +23,24 @@ app.use(bodyParser.json())
 
 
 const lookupMeetings = (request, response, next) => {
-    const authorization = request.headers.authorization; 
-    if (authorization) {
+    try {
+        const authorization = request.headers.authorization; 
         const encodedToken = authorization.split(' ')[1]
         const decodedToken = jwt.decode(encodedToken) 
-        const currentUser = { 
-            id: decodedToken.id, 
-            username: decodedToken.username 
-        } 
-        console.log(currentUser) 
-    } else {
-        response.sendStatus(403).json({error: "Unauthorized"})
+        db("meeting_attendee")
+            .select("*")
+            .where('user_id', decodedToken.id)
+            .returning("*")
+            .then(meeting_attendees => {
+                if (meeting_attendees == []) {
+                    // no meetings 
+                } else {
+                    
+                }
+            })
+    } catch (error) {
+        console.log(error); 
+        response.sendStatus(403) // forbidden 
     }
 }
 
